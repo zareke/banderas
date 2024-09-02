@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect } from "react";
+import styles from "../styles/Home.module.css";
 export default function Home() {
   const [countries, setCountries] = useState([]);
   const [currentCountry, setCurrentCountry] = useState(null);
   const [points, setPoints] = useState(0);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [timer, setTimer] = useState(15);
 
-  // Obtener los datos de los países y seleccionar uno aleatoriamente
   useEffect(() => {
     async function fetchCountries() {
-      const response = await fetch('https://countriesnow.space/api/v0.1/countries/flag/images');
+      const response = await fetch(
+        "https://countriesnow.space/api/v0.1/countries/flag/images"
+      );
       const data = await response.json();
       const countriesData = data.data;
       setCountries(countriesData);
@@ -20,59 +21,64 @@ export default function Home() {
     fetchCountries();
   }, []);
 
-  // Seleccionar un país aleatoriamente
   function selectRandomCountry(countriesData) {
-    const randomCountry = countriesData[Math.floor(Math.random() * countriesData.length)];
+    const randomCountry =
+      countriesData[Math.floor(Math.random() * countriesData.length)];
     setCurrentCountry(randomCountry);
-    console.log(randomCountry)
-    setTimer(15); // Reinicia el temporizador
+    setTimer(15);
   }
 
-  // Manejar la entrada del usuario
   function handleInputChange(e) {
-    setInput(e.target.value.toUpperCase()); // Convertir a mayúsculas
+    setInput(e.target.value.toUpperCase());
   }
 
-  // Comprobar si la respuesta es correcta
   function checkAnswer(isTimeUp = false) {
     if (!isTimeUp && input === currentCountry.name.toUpperCase()) {
       setPoints(points + 10);
     } else {
       setPoints(points - 1);
     }
-    setInput('');
+    setInput("");
     selectRandomCountry(countries);
   }
 
-  // Temporizador
   useEffect(() => {
     if (timer > 0) {
       const countdown = setTimeout(() => setTimer(timer - 1), 1000);
       return () => clearTimeout(countdown);
     } else {
-      checkAnswer(true); // Cambiar de país cuando se acaba el tiempo
+      checkAnswer(true);
     }
   }, [timer]);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Adivina el país por su bandera</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Adivina el país por su bandera</h1>
       {currentCountry && (
         <div>
-          <img src={currentCountry.flag} alt="Bandera" style={{ width: '200px' }} />
+          <img
+            src={currentCountry.flag}
+            alt="Bandera"
+            className={styles.flagImage}
+          />
         </div>
       )}
       <input
         type="text"
         value={input}
         onChange={handleInputChange}
-        placeholder="Escribe el nombre del país"
-        style={{ textTransform: 'uppercase' }} // Estilo para mostrar mayúsculas
+        placeholder="Escribe el nombre del país (en inglés)"
+        className={styles.inputField}
       />
-      <button onClick={() => checkAnswer(false)}>Comprobar</button>
-      <div>
-        <h2>Puntos: {points}</h2>
-        <h3>Tiempo restante: {timer}</h3>
+      <button onClick={() => checkAnswer(false)} className={styles.button}>
+        Comprobar
+      </button>
+      <div className="centrador">
+        <h2 className={styles.points}>Puntos: {points}</h2>
+      </div>
+      <div className="centrador">
+        {" "}
+        <h3 className={styles.timer}>Tiempo restante: {timer}</h3>
       </div>
     </div>
   );
